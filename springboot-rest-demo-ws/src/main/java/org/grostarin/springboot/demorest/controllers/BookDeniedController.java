@@ -1,10 +1,15 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package org.grostarin.springboot.demorest.controllers;
 
 import javax.validation.Valid;
-
 import org.grostarin.springboot.demorest.annotations.LogExecutionTime;
 import org.grostarin.springboot.demorest.domain.Book;
+import org.grostarin.springboot.demorest.domain.BookDenied;
 import org.grostarin.springboot.demorest.dto.BookSearch;
+import org.grostarin.springboot.demorest.services.BookDeniedService;
 import org.grostarin.springboot.demorest.services.BookServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,33 +21,35 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ *
+ * @author Steeve
+ */
 @RestController
-@RequestMapping("/api/books")
-public class BookController {
+@RequestMapping("/api/bookdenied")
+public class BookDeniedController {
 
     @Autowired
-    private BookServices bookServices;
+    private BookDeniedService bookServices;
 
     @GetMapping
     @LogExecutionTime
-    public Iterable<Book> findAll(@Valid BookSearch bookSearchDTO) {
+    public Iterable<BookDenied> findAll(@Valid BookSearch bookSearchDTO) {
         return bookServices.findAll(bookSearchDTO);
     }
 
     @GetMapping("/{id}")
-    public Book findOne(@PathVariable long id) {
+    public BookDenied findOne(@PathVariable long id) {
         return bookServices.findOne(id);
     }
 
     @PostMapping
-    public ResponseEntity<Book> create(@RequestBody Book book) {
-        if (bookServices.create(book)) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(book);
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(book);
-
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookDenied create(@RequestBody BookDenied book) {
+        return bookServices.create(book);
     }
 
     @DeleteMapping("/{id}")
@@ -51,7 +58,8 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public Book updateBook(@RequestBody Book book, @PathVariable long id) {
+    public BookDenied updateBook(@RequestBody BookDenied book, @PathVariable long id) {
         return bookServices.updateBook(book, id);
     }
+
 }

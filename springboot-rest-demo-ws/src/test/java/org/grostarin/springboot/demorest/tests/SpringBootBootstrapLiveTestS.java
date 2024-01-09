@@ -1,31 +1,35 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package org.grostarin.springboot.demorest.tests;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import java.util.List;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
+import org.grostarin.springboot.demorest.domain.BookDenied;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-
-import org.grostarin.springboot.demorest.domain.Book;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class SpringBootBootstrapLiveTest {
+/**
+ *
+ * @author Steeve
+ */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class SpringBootBootstrapLiveTestS {
 
     @LocalServerPort
     private int port;
 
     private String getApiRoot() {
-        return "http://localhost:" + port + "/api/books";
+        return "http://localhost:" + port + "/api/bookdenied";
     }
 
     @Test
@@ -36,7 +40,7 @@ public class SpringBootBootstrapLiveTest {
 
     @Test
     public void whenGetBooksByTitle_thenOK() {
-        final Book book = createRandomBook();
+        final BookDenied book = createRandomBook();
         createBookAsUri(book);
 
         final Response response = RestAssured.get(getApiRoot() + "?title=" + book.getTitle());
@@ -47,7 +51,7 @@ public class SpringBootBootstrapLiveTest {
 
     @Test
     public void whenGetCreatedBookById_thenOK() {
-        final Book book = createRandomBook();
+        final BookDenied book = createRandomBook();
         final String location = createBookAsUri(book);
 
         final Response response = RestAssured.get(location);
@@ -65,22 +69,18 @@ public class SpringBootBootstrapLiveTest {
     // POST
     @Test
     public void whenCreateNewBook_thenCreated() {
-        final Book book = createRandomBook();
+        final BookDenied book = createRandomBook();
 
         final Response response = RestAssured.given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(book)
                 .post(getApiRoot());
         assertEquals(HttpStatus.CREATED.value(), response.getStatusCode());
-
-        Book responseBook = response.getBody().as(Book.class);
-        assertEquals(book.getTitle(), responseBook.getTitle());
-        assertEquals(book.getAuthor(), responseBook.getAuthor());
     }
 
     @Test
     public void whenInvalidBook_thenError() {
-        final Book book = createRandomBook();
+        final BookDenied book = createRandomBook();
         book.setAuthor(null);
 
         final Response response = RestAssured.given()
@@ -92,10 +92,10 @@ public class SpringBootBootstrapLiveTest {
 
     @Test
     public void whenUpdateCreatedBook_thenUpdated() {
-        final Book book = createRandomBook();
+        final BookDenied book = createRandomBook();
         final String location = createBookAsUri(book);
 
-        book.setId(Long.parseLong(location.split("api/books/")[1]));
+        book.setId(Long.parseLong(location.split("api/bookdenied/")[1]));
         book.setAuthor("newAuthor");
         Response response = RestAssured.given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -112,7 +112,7 @@ public class SpringBootBootstrapLiveTest {
 
     @Test
     public void whenDeleteCreatedBook_thenOk() {
-        final Book book = createRandomBook();
+        final BookDenied book = createRandomBook();
         final String location = createBookAsUri(book);
 
         Response response = RestAssured.delete(location);
@@ -123,14 +123,14 @@ public class SpringBootBootstrapLiveTest {
     }
 
     // ===============================
-    private Book createRandomBook() {
-        final Book book = new Book();
+    private BookDenied createRandomBook() {
+        final BookDenied book = new BookDenied();
         book.setTitle(randomAlphabetic(10));
         book.setAuthor(randomAlphabetic(15));
         return book;
     }
 
-    private String createBookAsUri(Book book) {
+    private String createBookAsUri(BookDenied book) {
         final Response response = RestAssured.given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(book)
@@ -138,5 +138,4 @@ public class SpringBootBootstrapLiveTest {
         return getApiRoot() + "/" + response.jsonPath()
                 .get("id");
     }
-
 }
